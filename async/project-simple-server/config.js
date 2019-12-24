@@ -1,0 +1,4 @@
+/*
+chrome://inspect/devices#devices
+
+*/

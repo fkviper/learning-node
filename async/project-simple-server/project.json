@@ -1,0 +1,22 @@
+{
+    "projects":[
+        {
+            "projectId" : 1,
+            "description": "Web client",
+            "language":"javascript",
+            "company":"xyz"
+        },
+        {
+            "projectId" : 2,
+            "description": "Network Application",
+            "techStack":"RUST",
+            "company":"abc"
+        },
+        {
+            "projectId" : 3,
+            "description": "Web Server",
+            "techStack":"NodeJS",
+            "company":"abc2"
+        }
+    ]
+}

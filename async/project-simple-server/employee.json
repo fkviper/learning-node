@@ -1,0 +1,38 @@
+{
+    "employees":[
+        { 
+            "employeeId": 1,
+            "name": "David",
+            "age": 31,
+            "gender": "Male",
+            "department":"Development",
+            "projectId" : 1
+        },
+        { 
+            "employeeId": 1,
+            "name": "Mark",
+            "age": 35,
+            "gender": "Male",
+            "department":"Development",
+            "projectId" : 2
+        },
+        { 
+            "employeeId": 1,
+            "name": "Ryan",
+            "age": 32,
+            "department":"Testing",
+            "gender": "Male",
+            "projectId" : 3
+        },
+        { 
+            "employeeId": 1,
+            "name": "Chris",
+            "age": 25,
+            "department":"Development",
+            "gender": "Male",
+            "projectId" : 3
+        }
+    ]    
+}
+    
+    
