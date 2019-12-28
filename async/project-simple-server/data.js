@@ -9,7 +9,6 @@ module.exports.getemployeedetails = async () => {
     let projectJson = await fsPromises.readFile('project.json',{encoding: 'utf8'});
     let employeeJson =await fsPromises.readFile('employee.json',{encoding: 'utf8'});
     
-
     let projects = JSON.parse(projectJson);
     let employees = JSON.parse(employeeJson);
     data = {
