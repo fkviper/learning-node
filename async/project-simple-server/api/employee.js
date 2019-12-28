@@ -9,8 +9,14 @@ router.use((req, res, next)=> {
 })
 
 router.get('/:id', async function (req, res) {
-  const emp = await db.getEmployeeById(req.params.id);
-  res.json(emp);
+  try{
+    const emp = await db.getEmployeeById(req.params.id);
+    res.json(emp);
+  }
+  catch(e){
+    res.json(e);
+  }
+  
 })
 
 module.exports = router
