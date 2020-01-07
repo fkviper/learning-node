@@ -1,0 +1,14 @@
+.weather-summary{
+    font-size: 30px;
+    margin: 40px 10px 30px 10px;
+    font-family: "Roboto";
+    
+}
+
+.degree-text{
+    font-size: 18px;
+}
+
+.temp-icon{
+    color:#05728f;
+}
