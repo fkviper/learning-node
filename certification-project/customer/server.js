@@ -130,18 +130,20 @@ io.on('connection',  (socket) => {
     })
 
   
-    socket.on('add-new-topic', (topic) => {
-        const html = `<div id="3" class="topic_item" onclick="location.href='#';" style="cursor: pointer;">
-                        <div class="chat_people">
-                        <div class="chat_img"> <i class="fa fa-users fa-2x" aria-hidden="true"></i> </div>
-                        <div class="chat_ib">
-                            <h5 class="topic_title">${topic}</h5>
-                            <p>Test, which is a new approach to have all solutions 
-                            astrology under one roof.</p>
-                        </div>
-                        </div>
-                    </div>`
-       socket.emit("new-topic-added");
+    socket.on('add-new-topic', (data) => {
+        const element = `<div id="4" class="topic_item" onclick="location.href='#';" style="cursor: pointer;">
+                            <div class="chat_people">
+                                <div class="chat_img"> <i class="fa fa-users fa-2x" aria-hidden="true"></i> </div>
+                                <div class="chat_ib">
+                                    <h5 class="topic_title">${data.topic}</h5>
+                                    <p>${data.description}</p>
+                                </div>
+                            </div>
+                        </div>`
+       socket.emit("new-topic-added",{
+           text : element,
+           socketId :data.socketId
+       });
     });
 
 

@@ -20,6 +20,11 @@ $(function () {
             $('.msg_history').append(message.text);
     });
 
+    socket.on('new-topic-added', function (message) {
+        if (message.socketId != socket.id)
+            $('.topic_list').append(message.text);
+    });
+
     // userlist event
     socket.on('topic-created', (data) => {
         console.log("client : userlist event : data => ", data)
@@ -59,10 +64,20 @@ $(function () {
     });
     $('#create-topic-btn').on('click', function (event) {
         event.preventDefault();
-        socket.emit('add-new-topic', {
-            message: $('#text-message').val()
-        });
-        $('#chatText').val('');
+        const topicName = $("#new-topic-text").val();
+        $("#topic-name-id").attr("value",topicName );
+        $('#myModal').modal({show: true});
+        $("#final-create-topic-btn").on('click',function(event){
+            const nickname = $("#nick-name-id").val();
+            const description =$("#topic-description-id").val();
+            socket.emit('add-new-topic', {
+                name : nickname,
+                topic: topicName,
+                description:description,
+                socketId: socket.id
+            });
+            $('#chatText').val('');
+        });        
     });
 
     $('.topic_item').on('click',function(event){
