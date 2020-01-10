@@ -1,50 +1,89 @@
-const socket = io();
+$(function () {
+    const socket = io();
 
-let isNickSet = false
-// chat event
-socket.on('incoming-message', function (message) {
-   let incoming_msg = `<div class="incoming_msg"><div class="incoming_msg_img"><img src="https://ptetutorials.com/images/user-profile.png" alt="Annonymous User"></div>
-                        <div class="received_msg">
-                            <div class="received_withd_msg">
-                            <p>${message.text}</p>
-                            <span class="time_date"> ${message.timestamp}</span></div>
-                        </div>
-                        </div>`;
-    $('.incoming_msg').append(incoming_msg);
-});
+    socket.on('connect', () => {
+        let activeTopic =$(".active_topic").find(".topic_title").text();
+        const newUserEnteredData = {
+            active: activeTopic,
+            socketId: socket.id
+        };
+        socket.emit('user-entered-topic', newUserEnteredData);
+    });
 
-// userlist event
-socket.on('topic-created', (data)=>{
-    console.log("client : userlist event : data => ", data)
-    $('#activeuser').empty()
-    data.map((item)=>{
-        $('#activeuser').append(`nickname: <strong>${item}<strong><br/>`)
+    socket.on('incoming-message', function (message) {
+        if (message.socketId != socket.id)
+            $('.msg_history').append(message.text);
+    });
+
+    socket.on('new-user-entered', function (message) {
+        if (message.socketId != socket.id)
+            $('.msg_history').append(message.text);
+    });
+
+    // userlist event
+    socket.on('topic-created', (data) => {
+        console.log("client : userlist event : data => ", data)
+        $('#activeuser').empty()
+        data.map((item) => {
+            $('#activeuser').append(`nickname: <strong>${item}<strong><br/>`)
+        })
+        let total = data.length;
+        document.getElementById('listu').innerHTML = total
+        $('b').val(total);
     })
-    let total = data.length;
-    document.getElementById('listu').innerHTML= total
-    $('b').val(total);
-})
-
-$(function() {
-    // Send chat message
-    $('.msg_send_btn').on('click', function(event) {
+    $('.msg_send_btn').on('click', function (event) {
         event.preventDefault();
         const d = new Date();
         const ts = `${d.getHours()}:${d.getMinutes()}`;
-        var months = ["January", "February", "March", "April", "May", "June", "July","August","September","October","Novembar","Decembar"];
+        var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "Novembar", "Decembar"];
         const timeStampStr = `${ts} | ${months[d.getMonth()]} ${d.getDate()}`;
         /*11:01 | June 9*/
-        socket.emit('new-message', {
-                message: $('#text-message').val(),
-                timeStamp: timeStampStr
-        });
-        $('#chatText').val('');
+
+        let title = $(".active_topic").find(".topic_title").text();
+        console.log(title);
+        let eventData = {
+            topic: title,
+            message: $('#text-message').val(),
+            timeStamp: timeStampStr,
+            socketId: socket.id
+        };
+
+        socket.emit('new-message', eventData);
+        let messageHtml = `<div class="outgoing_msg">
+                                <div class="sent_msg">
+                                <p>${eventData.message}</p>
+                                <span class="time_date"> ${eventData.timeStamp}</span> </div>
+                            </div>`;
+        $('.msg_history').append(messageHtml);
+        $('#text-message').val('');
     });
-    $('#create-topic-btn').on('click', function(event) {
+    $('#create-topic-btn').on('click', function (event) {
         event.preventDefault();
-        socket.emit('chat', {
-                message:$('#text-message').val()
+        socket.emit('add-new-topic', {
+            message: $('#text-message').val()
         });
         $('#chatText').val('');
     });
+
+    $('.topic_item').on('click',function(event){
+        event.preventDefault();
+        const id = $(this).attr('id');
+        const idStr = `#${id}`;
+        const NewTopic = $(idStr).find(".topic_title").text();
+        console.log("Topic id :" , id);
+        console.log("Topic text :",NewTopic);
+        const newUserEnteredData = {
+            active: NewTopic,
+            socketId: socket.id
+        };
+        console.log(newUserEnteredData);
+        const currTopic = $(".active_topic").find(".topic_title").text();
+        if(NewTopic != currTopic){
+            socket.emit('user-leave-topic',currTopic);
+            socket.emit('user-entered-topic', newUserEnteredData);
+            $(".active_topic").removeClass("active_topic");
+            $(this).addClass("active_topic");
+            $(".msg_history").empty();
+        }
+    })
 });

@@ -62,14 +62,21 @@ img{ max-width:100%;}
 }
 
 .chat_people{ overflow:hidden; clear:both;}
-.chat_list {
+.topic_item {
   border-bottom: 2px solid #c4c4c4;
   margin: 0;
   padding: 18px 16px 10px;
 }
 .inbox_chat { height: 550px; overflow-y: scroll;}
 
-.active_chat{ background:#ebebeb;}
+.active_topic{background: white;
+  color:#05728f;
+}
+
+.active_topic h5{
+  font-weight: bold;
+  color : #05728f;
+}
 
 .incoming_msg_img {
   display: inline-block;

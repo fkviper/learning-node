@@ -4,7 +4,7 @@ const publicIp = require('public-ip');
 const userloc = async ()=>{
     try{
         const ip = await publicIp.v4()
-        console.log("ip : ", ip)
+        //console.log("ip : ", ip)
         return await iplocate(ip)    
     }catch(err){
         console.log(err)

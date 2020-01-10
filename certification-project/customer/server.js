@@ -14,13 +14,13 @@ const port = 3002;
 
 app.set('view engine', 'ejs')
 app.set('views', './views')
-
+app.set('port',port);
 app.get('/', async (req,res)=>{
     try{
         const loc = await userloc();
         const lon = loc.longitude
         const lat = loc.latitude
-        console.log(`lon: ${lon}, lat: ${lat}`);
+        //console.log(`lon: ${lon}, lat: ${lat}`);
     
         const response = await getWeather(lon,lat);
         const weather = {
@@ -31,9 +31,9 @@ app.get('/', async (req,res)=>{
                 temp_max: response.data.main.temp_max,
                 city: response.data.name
         }
-        console.log("weather: ", weather);
+        //console.log("weather: ", weather);
         const news = await newsModel.find().limit(3);
-        console.log(news);
+        //console.log(news);
         res.render('home', {
                     weather,
                     news
@@ -57,16 +57,16 @@ app.get('/contact_us', (req,res)=>{
 })
 
 
-app.listen(port, () => {
-    console.log('Customer server listening on port ' + port);
-  });
 
 
-const http = require('http');
+
+var http = require('http');
 const server = http.createServer(app).listen(app.get('port'), () => {
     console.log("Express server listening on port " + app.get('port'));
 });
-const io = require('socket.io').listen(server);
+
+var io = require('socket.io').listen(server);
+
 
 
 /*
@@ -84,40 +84,87 @@ message ={
 }
 */
 let topics = [];
+let usersSocketIds = [];
+let users = [];
 
 // connection event
 // socket represents each client connected to our server
 io.on('connection',  (socket) => {
-
-    socket.on('connect', ()=>{
-        console.log("New connection socket.id : ", socket.id)
+    console.log("New connection socket.id : ", socket.id);
+    users.push(
+        {"key" : socket.id,
+        "socket" : socket}
+    );
+    socket.on('user-leave-topic',(topic)=>{
+        socket.leave(topic);
     })
+    
+    socket.on('user-entered-topic', (data)=>{
+        console.log(data);
+        topics.push(data.active);
+        usersSocketIds.push(data.socketId);
+        let userEnteredHtml = `<div class="new_user_entered">
+                                <div class="new_user">
+                                    <p>New user entered to the chat</p>
+                                </div>`;
+        const sId = data.socketId;
+        let dataMsg={
+            text: userEnteredHtml,
+            socketId : sId};
+        console.log(dataMsg);
+        socket.join(data.active,() => {
+            let rooms = Object.keys(socket.rooms);
+            console.log(rooms); // [ <socket.id>, 'room 237' ]            
+            console.log(dataMsg);
+            io.to(data.active).emit('new-user-entered',dataMsg); // broadcast to everyone in the room
+        });
+        
+    });
 
     socket.on('disconnect', ()=>{
-        console.log("disconnect => nickname : ", socket.nickname)
-        const updatedUsers = users.filter(user => user != socket.nickname)
-        console.log("updatedUsers : ", updatedUsers)
-        users = updatedUsers
-        io.emit('userlist', users)
+        users =  users.filter((user)=>{
+            return user.key != socket.id;
+        })
+        console.log("disconnected");
+        console.log(users);
     })
 
-    // nick event
-    socket.on('topic-created', (nickname) => {
-        console.log("nick => nickname : ", nickname)
-        socket.nickname = nickname
-        users.push(nickname)
-
-        console.log("server : users : ", users)
-        // emit userlist event to all connected sockets
-        io.emit('userlist', users);
+  
+    socket.on('add-new-topic', (topic) => {
+        const html = `<div id="3" class="topic_item" onclick="location.href='#';" style="cursor: pointer;">
+                        <div class="chat_people">
+                        <div class="chat_img"> <i class="fa fa-users fa-2x" aria-hidden="true"></i> </div>
+                        <div class="chat_ib">
+                            <h5 class="topic_title">${topic}</h5>
+                            <p>Test, which is a new approach to have all solutions 
+                            astrology under one roof.</p>
+                        </div>
+                        </div>
+                    </div>`
+       socket.emit("new-topic-added");
     });
 
-    // chat event
+
     socket.on('new-message', (data) => {
-        const messgae = data;
-        const response = ejs.render('./templates/incomingMsg',messgae);
-        io.emit('incoming-message', response);
+        console.log("new-message called with data",data);
+        const message = data;
+        //const response = ejs.render('/templates/incomingMsg',{message})
+        const response = `<div class="incoming_msg">
+                            <div class="incoming_msg_img">
+                            <img src="https://ptetutorials.com/images/user-profile.png" alt="Annonymous User">
+                            </div>
+                            <div class="received_msg">
+                            <div class="received_withd_msg">
+                                <p>${data.message}</p>
+                                <span class="time_date"> ${message.timeStamp} </span></div>
+                            </div>
+                        </div>`;
+        io.to(data.topic).emit('incoming-message',{
+            text:response,
+            socketId: data.socketId}
+            );
     });
 });
+
 
 

@@ -22,8 +22,8 @@
         <link rel="stylesheet" href="css/chat.css">
         <link rel="stylesheet" href="css/weather.css">     
         
-        <script src="/js/socket.io.js"></script>
-        <script src="/js/chatclient.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        
     </head>
     <body>
       <div class="container">
@@ -36,5 +36,6 @@
         <%- include('./partials/chat'); %>
         <%- include('./partials/footer'); %>
       </div> 
+      <script src="/js/chatclient.js"></script>
     </body>
 </html>
