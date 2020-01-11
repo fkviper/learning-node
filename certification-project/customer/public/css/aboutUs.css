@@ -1,0 +1,20 @@
+#map {
+    height: 400px;  /* The height is 400 pixels */
+    width: 100%;  /* The width is the width of the web page */
+    border: 2px solid #05728f;
+}
+.about-us-whole{
+    margin:70px auto;
+}
+.about-us{
+    margin:auto
+}
+
+.about-us p{
+    margin: 20px auto;
+}
+
+.signature{
+    font-size: 18px;
+    font-weight: bold;
+}

@@ -10,6 +10,7 @@ app.use(bodyParser.json());
 const userloc =require('./utility/location');
 const  getWeather =require('./utility/weather');
 const newsModel = require('./models/news');
+const sportModel = require('./models/sportsNews');
 const port = 3002;
 
 app.set('view engine', 'ejs')
@@ -45,9 +46,19 @@ app.get('/', async (req,res)=>{
     
 })
 
+app.get('/sports',async (req,res)=>{
+    try{
+        const sports = await sportModel.find();
+        res.render('sportNews',{sports});
+    }
+    catch(error){
+        res.status(500).send(error);
+    }
+   
+})
 
 app.get('/about_us', (req,res)=>{
-    res.render('about_us')
+    res.render('aboutUs');
 })
 
 app.get('/contact_us', (req,res)=>{
@@ -68,21 +79,6 @@ const server = http.createServer(app).listen(app.get('port'), () => {
 var io = require('socket.io').listen(server);
 
 
-
-/*
-topic = {
-    id,
-    title,
-    messages
-}
-
-message ={
-    type(incoming/outgoing/user)
-    username
-    textMsg
-    timestamp
-}
-*/
 let topics = [];
 let usersSocketIds = [];
 let users = [];
