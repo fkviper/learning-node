@@ -86,7 +86,11 @@ message ={
 let topics = [];
 let usersSocketIds = [];
 let users = [];
+let topicId = 3;
 
+const getNextTopicId = () =>{
+    return ++topicId;
+}
 // connection event
 // socket represents each client connected to our server
 io.on('connection',  (socket) => {
@@ -131,7 +135,8 @@ io.on('connection',  (socket) => {
 
   
     socket.on('add-new-topic', (data) => {
-        const element = `<div id="4" class="topic_item" onclick="location.href='#';" style="cursor: pointer;">
+        let sTopicId = getNextTopicId();
+        const element = `<div id="${sTopicId}" class="topic_item" onclick="location.href='#';" style="cursor: pointer;">
                             <div class="chat_people">
                                 <div class="chat_img"> <i class="fa fa-users fa-2x" aria-hidden="true"></i> </div>
                                 <div class="chat_ib">

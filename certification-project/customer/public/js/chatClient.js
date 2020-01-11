@@ -1,6 +1,50 @@
 $(function () {
     const socket = io();
+    function createTopicHandler(event){
+        event.preventDefault();
+        let topicName = $("#new-topic-text").val();
+        $("#topic-name-id").attr("value",topicName );
+        $('#myModal').modal({show: true});
+        $("#final-create-topic-btn").on('click',function(event){
+            const nickname = $("#nick-name-id").val();
+            const description =$("#topic-description-id").val();
+            topicName =  $("#topic-name-id").val();
+            socket.emit('add-new-topic', {
+                name : nickname,
+                topic: topicName,
+                description:description,
+                socketId: socket.id
+            });
+            //erase everything before closing.
+            $('#new-topic-text').val('');
+            $("#topic-name-id").val('');
+            $("#nick-name-id").val('');
+            $("#topic-description-id").val('');
+            $('#myModal').modal('hide');
+        });        
+    };
 
+    function onTopicClickEventHandler(event){
+        event.preventDefault();
+        const id = $(this).attr('id');
+        const idStr = `#${id}`;
+        const NewTopic = $(idStr).find(".topic_title").text();
+        console.log("Topic id :" , id);
+        console.log("Topic text :",NewTopic);
+        const newUserEnteredData = {
+            active: NewTopic,
+            socketId: socket.id
+        };
+        console.log(newUserEnteredData);
+        const currTopic = $(".active_topic").find(".topic_title").text();
+        if(NewTopic != currTopic){
+            socket.emit('user-leave-topic',currTopic);
+            socket.emit('user-entered-topic', newUserEnteredData);
+            $(".active_topic").removeClass("active_topic");
+            $(this).addClass("active_topic");
+            $(".msg_history").empty();
+        }
+    };
     socket.on('connect', () => {
         let activeTopic =$(".active_topic").find(".topic_title").text();
         const newUserEnteredData = {
@@ -20,9 +64,10 @@ $(function () {
             $('.msg_history').append(message.text);
     });
 
+    //if condition is not required because this is a broadcaseted message.
     socket.on('new-topic-added', function (message) {
-        if (message.socketId != socket.id)
-            $('.topic_list').append(message.text);
+        $('.topic_list').append(message.text);
+        $('.topic_item').on('click', onTopicClickEventHandler);
     });
 
     // userlist event
@@ -62,43 +107,6 @@ $(function () {
         $('.msg_history').append(messageHtml);
         $('#text-message').val('');
     });
-    $('#create-topic-btn').on('click', function (event) {
-        event.preventDefault();
-        const topicName = $("#new-topic-text").val();
-        $("#topic-name-id").attr("value",topicName );
-        $('#myModal').modal({show: true});
-        $("#final-create-topic-btn").on('click',function(event){
-            const nickname = $("#nick-name-id").val();
-            const description =$("#topic-description-id").val();
-            socket.emit('add-new-topic', {
-                name : nickname,
-                topic: topicName,
-                description:description,
-                socketId: socket.id
-            });
-            $('#chatText').val('');
-        });        
-    });
-
-    $('.topic_item').on('click',function(event){
-        event.preventDefault();
-        const id = $(this).attr('id');
-        const idStr = `#${id}`;
-        const NewTopic = $(idStr).find(".topic_title").text();
-        console.log("Topic id :" , id);
-        console.log("Topic text :",NewTopic);
-        const newUserEnteredData = {
-            active: NewTopic,
-            socketId: socket.id
-        };
-        console.log(newUserEnteredData);
-        const currTopic = $(".active_topic").find(".topic_title").text();
-        if(NewTopic != currTopic){
-            socket.emit('user-leave-topic',currTopic);
-            socket.emit('user-entered-topic', newUserEnteredData);
-            $(".active_topic").removeClass("active_topic");
-            $(this).addClass("active_topic");
-            $(".msg_history").empty();
-        }
-    })
+    $('#create-topic-btn').on('click', createTopicHandler );
+    $('.topic_item').on('click', onTopicClickEventHandler);
 });
