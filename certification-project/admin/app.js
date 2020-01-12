@@ -4,10 +4,8 @@ const db = require('./db');
 
 const auth = require('./api/auth');
 const news = require('./api/news');
-const contactus = require('./api/contactus');
 
 app.use('/api/auth', auth);
 app.use('/api/news', news);
-app.use('api/contactus/',contactus);
 
 module.exports = app;

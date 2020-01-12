@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const app = express();
+const app = require('./app');
 const path =require('path');
 const ejs = require('ejs');
 const db = require('./db');
@@ -61,14 +61,10 @@ app.get('/about_us', (req,res)=>{
     res.render('aboutUs');
 })
 
-app.get('/contact_us', (req,res)=>{
-    res.render('contact_us', {
-        msg: req.query.msg?req.query.msg:''
-    })
+app.get('/api/contactus', (req,res)=>{
+    let msg = req.query.msg;
+    res.render('contactUs',{msg});
 })
-
-
-
 
 
 var http = require('http');
